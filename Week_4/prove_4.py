@@ -10,6 +10,7 @@ class Node:
         self.label = l
         self.children = []
         self.num_children = 0
+        
     def add_child(self, child_node):
         self.children.append(child_node)
         self.num_children += 1
@@ -22,12 +23,10 @@ class Node:
         return self.num_children
     
     def __repr__(self, level=0):
-        ret = "\t" + "-" * level + repr(self.value)+"\n"
+        ret = '   ' * (level - 1) + '+---' * (level > 0) +  repr(self.value)+"\n"
         for child in self.children:
             ret += child.__repr__(level+1)
         return ret
-    
-    
     
 class Decision_Tree:
     head = Node()
@@ -156,8 +155,9 @@ def main():
             num_false += 1
         #print("Our prediction was: {}!".format(is_in))
              
-    print("Accuracy for the whole dataset: {:.2f}%".format(num_true/(num_true+num_false)*100))
     print(tree.head)
+    print("Accuracy for the whole dataset: {:.2f}%".format(num_true/(num_true+num_false)*100))
+
     
    
 if __name__ == "__main__":
