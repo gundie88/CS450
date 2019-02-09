@@ -1,6 +1,11 @@
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 import numpy as np
 import math
+import sys
+
 
 
 class Node:
@@ -28,7 +33,7 @@ class Node:
             ret += child.__repr__(level+1)
         return ret
     
-class Decision_Tree:
+class Decision_tree:
     head = Node()
     
     def __init__(self, h = -1):
@@ -136,15 +141,15 @@ def main():
     #col_names = ["buying", "maint", "doors", "persons", "lug_boot", "safety", "target"]
     data = get_data()
     # Build the tree
-    tree = Decision_Tree()
-    tree.build_tree(data)
+    tree_model = Decision_tree()
+    tree_model.build_tree(data)
     
     
     # Predict all rows and test if they are correct
     num_true = 0
     num_false = 0
     for row in data[:,:-1]:
-        results = tree.predict(row.tolist(), data[0].tolist())
+        results = tree_model.predict(row.tolist(), data[0].tolist())
         predicted_row = row.tolist()
         predicted_row.append(results)
         is_in = np.array(predicted_row) in data 
@@ -153,12 +158,55 @@ def main():
             num_true += 1
         else:
             num_false += 1
-        #print("Our prediction was: {}!".format(is_in))
-             
-    print(tree.head)
-    print("Accuracy for the whole dataset: {:.2f}%".format(num_true/(num_true+num_false)*100))
+    #print("Our prediction was: {}!".format(is_in))
+    print("Accuracy from my decision tree: {:.2f}%".format(num_true/(num_true+num_false)*100))
+#    misclassified = (data != results).sum()
+#    print('Misclassified samples my model: {}'.format(misclassified))
 
+    #for sk-learn model
+    count_misclassified, accuracy = sk_decision_tree()
+    print('Sk-learn Misclassified samples: {}'.format(count_misclassified))
+    print('Sk-learn Accuracy: {:.2f}'.format(accuracy))
+    
+
+
+
+def sk_decision_tree():
+    url = 'https://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data'
+    data = pd.read_csv(url, names=['buying','maint','doors','persons','lug_boot','safety','class'])
+
+    data = data.apply(lambda x: pd.factorize(x)[0])
+           
+    #setup of the car data and target
+    X = data.iloc[:,:-1]
+    y = data.iloc[:,-1]
+    
+    #train the data 
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+    dtree = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=0)
+    dtree.fit(X_train, y_train)
+    # use the model to make predictions with the test data
+    y_pred = dtree.predict(X_test)
+    # how did our model perform?=
+    count_misclassified = (y_test != y_pred).sum()
+    accuracy = accuracy_score(y_test, y_pred)
+ 
+    return count_misclassified, accuracy 
+
+       
+def write_tree_to_file():
+    data = get_data()
+    tree_model = Decision_tree()
+    tree_model.build_tree(data)
+    f = open('tree_output.txt','wt')      
+    print(tree_model.head, file =f)
+    
+#    sys.stdout = open('tree_output.txt','wt')         
+#    print(tree_model.head)
+#    
+    
     
    
 if __name__ == "__main__":
     main()
+    write_tree_to_file()
