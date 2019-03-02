@@ -11,28 +11,7 @@ import pandas as pd
 from sklearn.datasets import load_wine
 
 
-
-
 class nueral_network:
-
-    def sigmoid(self, activation):
-        return 1.0 / (1.0 + exp(-activation))
-    #activation fucntion
-    def activate(self, weights, inputs):
-        activation = weights[-1]
-        for i in range(len(weights) - 1):
-            activation += weights[i] * inputs[i]
-        return activation
-
-    def update_weights(self, network, row, l_rate):
-        for i in range(len(network)):
-            inputs = row[:-1]
-            if i != 0:
-                inputs = [neuron['output'] for neuron in network[i - 1]]
-            for neuron in network[i]:
-                for j in range(len(inputs)):
-                    neuron['weights'][j] += l_rate * neuron['delta'] * inputs[j]
-                neuron['weights'][-1] += l_rate * neuron['delta']
 
     # Forward propagate input to a network output
     def forward_propagate(self, network, row):
@@ -45,11 +24,13 @@ class nueral_network:
                 new_inputs.append(neuron['output'])
             inputs = new_inputs
         return inputs
-
-    # Calculate the derivative of an neuron output
-    def sigmoid_prime(self, output):
-        return output * (1.0 - output)
-
+    
+    #activation fucntion
+    def activate(self, weights, inputs):
+        activation = weights[-1]
+        for i in range(len(weights) - 1):
+            activation += weights[i] * inputs[i]
+        return activation
     # Backpropagate error and store in neurons
     def backward_propagate(self, network, expected):
         for i in reversed(range(len(network))):
@@ -68,11 +49,28 @@ class nueral_network:
             for j in range(len(layer)):
                 neuron = layer[j]
                 neuron['delta'] = errors[j] * self.sigmoid_prime(neuron['output'])
+                
+    #signmoid               
+    def sigmoid(self, activation):
+        return 1.0 / (1.0 + exp(-activation))
+    
+    # Calculate the derivative of an neuron output
+    def sigmoid_prime(self, output):
+        return output * (1.0 - output)
+
+    def update_weights(self, network, row, l_rate):
+        for i in range(len(network)):
+            inputs = row[:-1]
+            if i != 0:
+                inputs = [neuron['output'] for neuron in network[i - 1]]
+            for neuron in network[i]:
+                for j in range(len(inputs)):
+                    neuron['weights'][j] += l_rate * neuron['delta'] * inputs[j]
+                neuron['weights'][-1] += l_rate * neuron['delta']
 
     def fit(self, data, target, n_of_hidden_nodes, n_of_outputs, l_rate, cycles):
 
-        network = list()
-
+        network = []
         if len(data.shape) > 1:
             number_of_inputs = data.shape[1]
         else:
@@ -80,7 +78,6 @@ class nueral_network:
 
         hidden_layer = [{'weights': [random() for i in range(number_of_inputs + 1)]} for i in range(n_of_hidden_nodes)]
         output_layer = [{'weights': [random() for i in range(n_of_hidden_nodes + 1)]} for i in range(n_of_outputs)]
-
         network.append(hidden_layer)
         network.append(output_layer)
 
@@ -98,21 +95,14 @@ class nueral_network:
             accuracy = accuracy / len(data)
             graph = np.append(graph, accuracy)
         return neural_model(network), graph
+    
+    
 
 class neural_model:
     """creates the model, so you can input data"""
     def __init__(self, network):
         self.network = network
-
-    def sigmoid(self, activation):
-        return 1.0 / (1.0 + exp(-activation))
-
-    def activate(self, weights, inputs):
-        activation = weights[-1]
-        for i in range(len(weights) - 1):
-            activation += weights[i] * inputs[i]
-        return activation
-
+        
     # Forward propagate input to a network output
     def forward_propagate(self, network, row):
         inputs = row
@@ -124,6 +114,15 @@ class neural_model:
                 new_inputs.append(neuron['output'])
             inputs = new_inputs
         return inputs
+    
+    def sigmoid(self, activation):
+        return 1.0 / (1.0 + exp(-activation))
+
+    def activate(self, weights, inputs):
+        activation = weights[-1]
+        for i in range(len(weights) - 1):
+            activation += weights[i] * inputs[i]
+        return activation
 
     def predict(self, test):
         outputs_list = []
