@@ -203,7 +203,7 @@ def bagging(name, data_train, data_test, targets_train, targets_test):
 
 def random_for(name, data_train, data_test, targets_train, targets_test):
     """
-    random forrrest
+    random forrest
     """
     kfold = model_selection.KFold(n_splits=10, random_state=7)
     best_cross_val_score = 0
@@ -305,7 +305,7 @@ def main():
     name = "Diabetes Data"
     knn_testing(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "iris Data"
+    name = "Iris Data"
     knn_testing(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
     
     #Decision tree classifer
@@ -315,7 +315,7 @@ def main():
     name = "Diabetes Data"
     dtree(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "iris Data"
+    name = "Iris Data"
     dtree(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
     
     #Naive Bayes
@@ -325,7 +325,7 @@ def main():
     name = "Diabetes Data"
     naive_bayes(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "iris Data"
+    name = "Iris Data"
     naive_bayes(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     
@@ -338,7 +338,7 @@ def main():
     name = "Diabetes Data"
     bagging(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "iris Data"
+    name = "Iris Data"
     bagging(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     """
@@ -351,7 +351,7 @@ def main():
     name = "Diabetes Data"
     ada_boost(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "i   ris Data"
+    name = "Iris Data"
     ada_boost(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     
@@ -364,7 +364,7 @@ def main():
     name = "Diabetes Data"
     random_for(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "iris Data"
+    name = "Iris Data"
     random_for(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
     
     
