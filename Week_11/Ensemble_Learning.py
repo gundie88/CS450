@@ -83,42 +83,18 @@ def get_diabetes_data():
     return diabetes_data, diabetes_target
 
 
-def get_auto_data():
+def get_iris_data():
     """
-    Getting and cleaning data for auto mpg
+    Getting and cleaning data for iris iris
     
     """
-    auto_mpg = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data', 
-                           skipinitialspace=True, delim_whitespace=True)
-    
-    auto_mpg.columns = ['mpg', 'cylinders', 'displacement', 'horsepower', 'weight',
-                        'acceleration', 'model', 'origin', 'car_name']
-    #run to see what the data types are
-    #auto_mpg.dtypes
-    
-    #replacing the missing vlaues with NaN
-    auto_mpg[['horsepower']] = auto_mpg[['horsepower']].replace('?',np.NaN )
-    auto_mpg.horsepower = pd.to_numeric(auto_mpg.horsepower)
-    
-    #fills NaNs with mean of each column 
-    auto_mpg.fillna(auto_mpg.mean().round(0) , inplace=True)
-    
-    #dont need this column
-    del auto_mpg['car_name']
-    
-    values = auto_mpg.values
+    iris = datasets.load_iris()
+    iris_data = iris.data
+    iris_target = iris.target
 
-    # Now impute it
-    imputer = Imputer()
-    imputedData = imputer.fit_transform(values)
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    normalizedData = scaler.fit_transform(imputedData)
-    
-    #setup of the auto_mpg data and target
-    mpg_target = normalizedData[:,0]
-    mpg_data = normalizedData[:,0:8]
 
-    return mpg_data, mpg_target
+
+    return iris_data, iris_target
 
 #Display Regression Data
 def displayRegression(score):
@@ -145,53 +121,53 @@ def knn_testing(name, data_train, data_test, targets_train, targets_test):
         # print(" ")
     print("Best CV score {} n_neighbors = {}: {:.2f}\n".format(name, best_k, best_cross_val_score))
 #        print(" ")
-    mpg_classifier = KNeighborsRegressor(n_neighbors=best_k)
-    mpg_model = mpg_classifier.fit(data_train, targets_train)
-    score = (mpg_model.score(data_test, targets_test))
+    iris_classifier = KNeighborsRegressor(n_neighbors=best_k)
+    iris_model = iris_classifier.fit(data_train, targets_train)
+    score = (iris_model.score(data_test, targets_test))
      
     print ("{} best accuracy:" .format(name))
     displayRegression(score)
     print()
 
 def dtree(name, data_train, data_test, targets_train, targets_test):
-    if name == "MPG Data":
-        classifier = DecisionTreeRegressor(random_state=42)
-        model = classifier.fit(data_train, targets_train)
-        predictions = model.predict(data_test)
-        
-        metric = mean_absolute_error(targets_test, predictions)
-        print("Best Accuracy for {} on Decision Tree: {:.2f}".format(name, metric*100))
-        print(" ")
-        
-    else:
-        classifier = DecisionTreeClassifier(random_state=42)
-        model = classifier.fit(data_train, targets_train)
-        predictions = model.predict(data_test)
-        
-        metric = accuracy_score(targets_test, predictions)
-        print("Best Accuracy for {} on Decision Tree: {:.2f}".format(name, metric*100))
-        print(" ")   
+#    if name == "iris Data":
+#        classifier = DecisionTreeRegressor(random_state=42)
+#        model = classifier.fit(data_train, targets_train)
+#        predictions = model.predict(data_test)
+#        
+#        metric = mean_absolute_error(targets_test, predictions)
+#        print("Best Accuracy for {} on Decision Tree: {:.2f}".format(name, metric*100))
+#        print(" ")
+#        
+#    else:
+    classifier = DecisionTreeClassifier(random_state=42)
+    model = classifier.fit(data_train, targets_train)
+    predictions = model.predict(data_test)
+    
+    metric = accuracy_score(targets_test, predictions)
+    print("Best Accuracy for {} on Decision Tree: {:.2f}".format(name, metric*100))
+    print(" ")   
         
 def naive_bayes(name, data_train, data_test, targets_train, targets_test):
     """
     Naive Bayes
     """
-    if name == "MPG Data":
-        regressor = BayesianRidge()
-        model = regressor.fit(data_train, targets_train)
-        predictions = model.predict(data_test)
-        
-        metric = mean_absolute_error(targets_test, predictions)
-        print("Best Accuracy for {} on Naive Bayes: {:.2f}".format(name, metric*100))
-        print(" ")
-
-    else:
-        clf = GaussianNB()
-        clf.fit(data_train, targets_train)
-        predictions = clf.predict(data_test)
-        metric = accuracy_score(targets_test, predictions)
-        print("Best Accuracy for {} on Naive Bayes: {:.2f}".format(name, metric*100))
-        print(" ")
+#    if name == "iris Data":
+#        regressor = BayesianRidge()
+#        model = regressor.fit(data_train, targets_train)
+#        predictions = model.predict(data_test)
+#        
+#        metric = mean_absolute_error(targets_test, predictions)
+#        print("Best Accuracy for {} on Naive Bayes: {:.2f}".format(name, metric*100))
+#        print(" ")
+#
+#    else:
+    clf = GaussianNB()
+    clf.fit(data_train, targets_train)
+    predictions = clf.predict(data_test)
+    metric = accuracy_score(targets_test, predictions)
+    print("Best Accuracy for {} on Naive Bayes: {:.2f}".format(name, metric*100))
+    print(" ")
 
 
 def bagging(name, data_train, data_test, targets_train, targets_test):
@@ -234,18 +210,18 @@ def random_for(name, data_train, data_test, targets_train, targets_test):
     best_k = 100
 
     for k in range(100,500,50):
-        if name == "MPG Data":
-            classifier = BaggingRegressor(max_samples=k)
-            model = classifier.fit(data_train, targets_train)
-            score = cross_val_score(model, data_train, targets_train, cv=kfold)
-            metric = score.mean()
-            print("CV score for Random Forest on {} n_estimators = {}: {:.2f}".format(name,k, metric))
-        else:
-            classifier = RandomForestClassifier(n_estimators=k)
-            model = classifier.fit(data_train, targets_train)
-            score = cross_val_score(model, data_train, targets_train, cv=kfold)
-            metric = score.mean()
-            print("CV score for Random Forest on {} n_estimators = {}: {:.2f}".format(name,k, metric))
+#        if name == "iris Data":
+#            classifier = BaggingRegressor(max_samples=k)
+#            model = classifier.fit(data_train, targets_train)
+#            score = cross_val_score(model, data_train, targets_train, cv=kfold)
+#            metric = score.mean()
+#            print("CV score for Random Forest on {} n_estimators = {}: {:.2f}".format(name,k, metric))
+#        else:
+        classifier = RandomForestClassifier(n_estimators=k)
+        model = classifier.fit(data_train, targets_train)
+        score = cross_val_score(model, data_train, targets_train, cv=kfold)
+        metric = score.mean()
+        print("CV score for Random Forest on {} n_estimators = {}: {:.2f}".format(name,k, metric))
 
     if metric > best_cross_val_score:
         best_cross_val_score = metric
@@ -261,19 +237,19 @@ def ada_boost(name, data_train, data_test, targets_train, targets_test):
     best_cross_val_score = 0
     best_k = 100
     for k in range(100, 600, 100):
-        if name == "MPG Data":  
-            classifier = RandomForestRegressor(n_estimators=k)
-            model = classifier.fit(data_train, targets_train)
-            score = cross_val_score(model, data_train, targets_train, cv=kfold)
-            metric = score.mean()
-            print("AdaBoost CV score for {} n_estimators = {}: {:.2f}".format(name,k, metric))
-
-        else:
-            classifier = AdaBoostClassifier(n_estimators=k)
-            model = classifier.fit(data_train, targets_train)
-            score = cross_val_score(model, data_train, targets_train, cv=kfold)
-            metric = score.mean()
-            print("AdaBoost CV score for {} n_estimators = {}: {:.2f}".format(name,k, metric))
+#        if name == "iris Data":  
+#            classifier = RandomForestRegressor(n_estimators=k)
+#            model = classifier.fit(data_train, targets_train)
+#            score = cross_val_score(model, data_train, targets_train, cv=kfold)
+#            metric = score.mean()
+#            print("AdaBoost CV score for {} n_estimators = {}: {:.2f}".format(name,k, metric))
+#
+#        else:
+        classifier = AdaBoostClassifier(n_estimators=k)
+        model = classifier.fit(data_train, targets_train)
+        score = cross_val_score(model, data_train, targets_train, cv=kfold)
+        metric = score.mean()
+        print("AdaBoost CV score for {} n_estimators = {}: {:.2f}".format(name,k, metric))
         
     if metric > best_cross_val_score:
         best_cross_val_score = metric
@@ -289,7 +265,7 @@ def ada_boost(name, data_train, data_test, targets_train, targets_test):
 def main():
     cancer_data, cancer_target = get_cancer_data()
     diabetes_data, diabetes_target = get_diabetes_data()
-    mpg_data, mpg_target = get_auto_data()
+    iris_data, iris_target = get_iris_data()
     
     
     
@@ -303,55 +279,55 @@ def main():
                                                                     train_size=.7,
                                                                     test_size=.3)
     
-    data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg = train_test_split(mpg_data, 
-                                                                        mpg_target, 
-                                                                        train_size=.7,
-                                                                       test_size=.3)
+    data_train_iris, data_test_iris, targets_train_iris, targets_test_iris = train_test_split(iris_data, 
+                                                                    iris_target, 
+                                                                    train_size=.7,
+                                                                    test_size=.3)
     """
     3 different "regular" learning algorithms
     """
     #running KNN on the three dataset
-#    name = "Cancer Data"
-#    knn_testing(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
-#    
-#    name = "Diabetes Data"
-#    knn_testing(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
-#
-#    name = "MPG Data"
-#    knn_testing(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
-#    
-#    #Decision tree classifer
-#    name = "Cancer Data"
-#    dtree(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
-#    
-#    name = "Diabetes Data"
-#    dtree(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
-#
-#    name = "MPG Data"
-#    dtree(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
-#    
-#    #Naive Bayes
-#    name = "Cancer Data"
-#    naive_bayes(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
-#    
-#    name = "Diabetes Data"
-#    naive_bayes(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
-#
-#    name = "MPG Data"
-#    naive_bayes(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
+    name = "Cancer Data"
+    knn_testing(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
+    
+    name = "Diabetes Data"
+    knn_testing(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
+
+    name = "iris Data"
+    knn_testing(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
+    
+    #Decision tree classifer
+    name = "Cancer Data"
+    dtree(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
+    
+    name = "Diabetes Data"
+    dtree(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
+
+    name = "iris Data"
+    dtree(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
+    
+    #Naive Bayes
+    name = "Cancer Data"
+    naive_bayes(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
+    
+    name = "Diabetes Data"
+    naive_bayes(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
+
+    name = "iris Data"
+    naive_bayes(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     
     """
     Bagging 
     """
-#    name = "Cancer Data"
-#    bagging(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
-#    
-#    name = "Diabetes Data"
-#    bagging(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
-#
-#    name = "MPG Data"
-#    bagging(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
+    name = "Cancer Data"
+    bagging(name, data_train_cancer, data_test_cancer, targets_train_cancer, targets_test_cancer)
+    
+    name = "Diabetes Data"
+    bagging(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
+
+    name = "iris Data"
+    bagging(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     """
     AdaBoost
@@ -363,8 +339,8 @@ def main():
     name = "Diabetes Data"
     ada_boost(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "MPG Data"
-    ada_boost(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
+    name = "i   ris Data"
+    ada_boost(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
 
     
     """
@@ -376,8 +352,8 @@ def main():
     name = "Diabetes Data"
     random_for(name, data_train_diabetes, data_test_diabetes, targets_train_diabetes, targets_test_diabetes)
 
-    name = "MPG Data"
-    random_for(name,data_train_mpg, data_test_mpg, targets_train_mpg, targets_test_mpg)
+    name = "iris Data"
+    random_for(name,data_train_iris, data_test_iris, targets_train_iris, targets_test_iris)
     
     
 if __name__ == "__main__":
