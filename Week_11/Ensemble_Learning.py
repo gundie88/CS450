@@ -114,12 +114,12 @@ def knn_testing(name, data_train, data_test, targets_train, targets_test):
         metric = mean_absolute_error(targets_test, predictions)
 
     
-        print("CV score for {} n_neighbors = {}: {:.2f}".format(name, k, metric))
+        print("KNN CV score for {} n_neighbors = {}: {:.2f}".format(name, k, metric))
         if metric <= best_cross_val_score:
             best_cross_val_score = metric
             best_k = k   
         # print(" ")
-    print("Best CV score {} n_neighbors = {}: {:.2f}\n".format(name, best_k, best_cross_val_score))
+    print("KNN Best CV score {} n_neighbors = {}: {:.2f}\n".format(name, best_k, best_cross_val_score))
 #        print(" ")
     iris_classifier = KNeighborsRegressor(n_neighbors=best_k)
     iris_model = iris_classifier.fit(data_train, targets_train)
@@ -145,7 +145,7 @@ def dtree(name, data_train, data_test, targets_train, targets_test):
     predictions = model.predict(data_test)
     
     metric = accuracy_score(targets_test, predictions)
-    print("Best Accuracy for {} on Decision Tree: {:.2f}".format(name, metric*100))
+    print("Best Accuracy for {} on Decision Tree: {:.2f}%".format(name, metric*100))
     print(" ")   
         
 def naive_bayes(name, data_train, data_test, targets_train, targets_test):
@@ -166,7 +166,7 @@ def naive_bayes(name, data_train, data_test, targets_train, targets_test):
     clf.fit(data_train, targets_train)
     predictions = clf.predict(data_test)
     metric = accuracy_score(targets_test, predictions)
-    print("Best Accuracy for {} on Naive Bayes: {:.2f}".format(name, metric*100))
+    print("Best Accuracy for {} on Naive Bayes: {:.2f}%".format(name, metric*100))
     print(" ")
 
 
@@ -228,6 +228,12 @@ def random_for(name, data_train, data_test, targets_train, targets_test):
         best_k = k
     print("{} best CV score for Random Foresst n_estimators = {}: {:.2f}".format(name, best_k, metric))
     print()
+    
+    classifier = RandomForestRegressor(n_estimators=best_k)
+    model = classifier.fit(data_train, targets_train)
+    score = (model.score(data_test, targets_test))
+    print ("{} best accuracy:" .format(name))
+    displayRegression(score)
 
 def ada_boost(name, data_train, data_test, targets_train, targets_test):
     """
@@ -257,6 +263,12 @@ def ada_boost(name, data_train, data_test, targets_train, targets_test):
     # print(" ")
     print("Best CV score for AdaBoost on {} n_estimators {}: {:.2f}".format(name, best_k, metric))
     print(" ")
+    
+    classifier = AdaBoostRegressor(n_estimators=best_k)
+    model = classifier.fit(data_train, targets_train)
+    score = (model.score(data_test, targets_test))
+    print ("{} best accuracy:" .format(name))
+    displayRegression(score)
     
     
     
